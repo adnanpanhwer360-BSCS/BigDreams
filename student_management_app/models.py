@@ -59,6 +59,8 @@ class Subjects(models.Model):
     subject_name = models.CharField(max_length=255)
     course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1) #need to give defauult course
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+        # Class the subject is taught in (for HOD view only). Optional, so old subjects keep working.
+    class_name = models.CharField(max_length=50, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()

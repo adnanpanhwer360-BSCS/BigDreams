@@ -612,8 +612,11 @@ def add_subject_save(request):
         staff_id = request.POST.get('staff')
         staff = CustomUser.objects.get(id=staff_id)
 
+        # Class chosen in the form (Class 1 to Class 5). Empty if the HOD left it blank.
+        class_name = request.POST.get('class_name', '')
+
         try:
-            subject = Subjects(subject_name=subject_name, course_id=course, staff_id=staff)
+            subject = Subjects(subject_name=subject_name, course_id=course, staff_id=staff, class_name=class_name)
             subject.save()
             messages.success(request, "Subject Added Successfully!")
             return redirect('add_subject')
@@ -664,7 +667,8 @@ def edit_subject_save(request):
 
             staff = CustomUser.objects.get(id=staff_id)
             subject.staff_id = staff
-            
+         # Class chosen in the form (empty if the HOD leaves it blank)
+            subject.class_name = request.POST.get('class_name', '')
             subject.save()
 
             messages.success(request, "Subject Updated Successfully.")
