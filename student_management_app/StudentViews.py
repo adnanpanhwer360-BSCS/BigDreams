@@ -25,6 +25,25 @@ def student_home(request):
     student_fee = StudentFee.objects.filter(student_id=student_obj).order_by('-fee_period').first()
         # Number of leave requests the HOD has approved (leave_status 1 = Approved)
     approved_leaves = LeaveReportStudent.objects.filter(student_id=student_obj, leave_status=1).count()
+        # Count the classes this student missed because of approved leave.
+    # A class counts when attendance was taken for the subject on a day inside an approved leave
+    # and this student has no saved record for it (leave days are skipped when saving).
+    leave_count = 0
+    approved = LeaveReportStudent.objects.filter(student_id=student_obj, leave_status=1)
+    course_subjects = Subjects.objects.filter(course_id=student_obj.course_id)
+    day_records = Attendance.objects.filter(subject_id__in=course_subjects, session_year_id=student_obj.session_year_id)
+    for record in day_records:
+        day = str(record.attendance_date)
+        if AttendanceReport.objects.filter(attendance_id=record, student_id=student_obj).exists():
+            continue
+        for leave in approved:
+            last_day = str(leave.leave_end_date) if leave.leave_end_date else leave.leave_date
+            if leave.leave_date <= day <= last_day:
+                leave_count += 1
+                break
+
+    # Leave classes are part of the total attendance
+    total_attendance = total_attendance + leave_count
     for subject in subject_data:
         attendance = Attendance.objects.filter(subject_id=subject.id)
         attendance_present_count = AttendanceReport.objects.filter(attendance_id__in=attendance, status=True, student_id=student_obj.id).count()
@@ -42,7 +61,8 @@ def student_home(request):
         "data_present": data_present,
         "data_absent": data_absent,
         "student_fee": student_fee,
-        "approved_leaves": approved_leaves
+                "approved_leaves": approved_leaves,
+        "leave_count": leave_count
     }
     return render(request, "student_template/student_home_template.html", context)
 
