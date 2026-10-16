@@ -52,7 +52,16 @@
 
       <ul class="navbar-nav ml-auto">
       
-            <!-- Announcements bell -->
+      <!-- Pending student leave requests -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_leave_view' %}" title="Student leave requests">
+          <i class="fas fa-envelope-open-text"></i>
+          {% if pending_student_leaves %}
+            <span class="badge badge-danger navbar-badge">{{ pending_student_leaves }}</span>
+          {% endif %}
+        </a>
+      </li>
+        <!-- Announcements bell -->
       <li class="nav-item">
         <a class="nav-link" href="{% url 'manage_announcement' %}" title="Announcements">
           <i class="fas fa-bell"></i>
