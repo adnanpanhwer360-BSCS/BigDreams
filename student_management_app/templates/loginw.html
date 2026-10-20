@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Underwater login demo</title>
+<style>
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+          --w1: #0a8fb3; --w2: #06607e; --w3: #04334f; --w4: #021a2b; --ink: #ffffff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --w1: #087a99; --w2: #05536d; --w3: #032b43; --w4: #01121f; } }
+  :root[data-theme="dark"] { --w1: #087a99; --w2: #05536d; --w3: #032b43; --w4: #01121f; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { overflow: hidden; color: var(--ink); font-family: "Segoe UI", Roboto, Arial, sans-serif;
+         background: linear-gradient(180deg, var(--w1) 0%, var(--w2) 35%, var(--w3) 70%, var(--w4) 100%); }
+
+  /* Light rays from the surface */
+  .ray { position: fixed; top: -10%; height: 120%; background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 80%); transform: skewX(-18deg); filter: blur(6px); pointer-events: none; animation: sway 9s ease-in-out infinite alternate; }
+  @keyframes sway { from { opacity: .25; transform: skewX(-18deg) translateX(-20px); } to { opacity: .8; transform: skewX(-12deg) translateX(30px); } }
+
+  /* Seaweed */
+  .weed { position: fixed; bottom: 0; width: 22px; border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: linear-gradient(0deg, #0b5d4a, #2fae7a); transform-origin: bottom center; animation: weed 4s ease-in-out infinite alternate; pointer-events: none; opacity: .85; }
+  @keyframes weed { from { transform: rotate(-7deg) scaleY(1); } to { transform: rotate(7deg) scaleY(1.06); } }
+
+  canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+  .stage { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: auto; pointer-events: none; }
+
+  .card { pointer-events: auto; width: 100%; max-width: 400px; padding: 36px 32px 30px; border-radius: 24px;
+          background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3);
+          -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+          box-shadow: 0 25px 60px rgba(0,20,40,.45), inset 0 1px 0 rgba(255,255,255,.35);
+          animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(40px) scale(.96); } to { opacity: 1; transform: none; } }
+
+  .logo { width: 70px; height: 70px; margin: 0 auto 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;
+          background: rgba(255,255,255,.2); box-shadow: 0 0 0 6px rgba(255,255,255,.08); animation: bob 3.5s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  h1 { margin: 0 0 24px; text-align: center; font-size: 23px; font-weight: 700; letter-spacing: .3px; }
+
+  .field { position: relative; margin-bottom: 18px; }
+  .field input { width: 100%; height: 52px; padding: 18px 48px 0 16px; font-size: 15px; color: #fff; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.3); border-radius: 14px; outline: none; transition: .25s; }
+  .field input:focus { border-color: #8be9ff; background: rgba(255,255,255,.18); box-shadow: 0 0 0 4px rgba(139,233,255,.2); }
+  .field label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.75); font-size: 15px; pointer-events: none; transform-origin: left; transition: .2s; }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label { top: 14px; transform: translateY(0) scale(.78); color: #b9f3ff; }
+  .eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: rgba(255,255,255,.8); font-size: 12px; font-weight: 700; cursor: pointer; padding: 8px; border-radius: 8px; }
+  .eye:hover { background: rgba(255,255,255,.15); }
+
+  .go { position: relative; overflow: hidden; width: 100%; height: 52px; border: 0; border-radius: 14px; color: #02334a; font-size: 16px; font-weight: 700; cursor: pointer;
+        background: linear-gradient(135deg, #8be9ff, #4fd1c5); box-shadow: 0 12px 26px rgba(0,30,50,.4); transition: .2s; }
+  .go:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(0,30,50,.5); }
+  .go:active { transform: scale(.98); }
+  .toast { margin-top: 14px; text-align: center; font-size: 13px; opacity: 0; transition: opacity .3s; min-height: 18px; }
+  .toast.on { opacity: .9; }
+  .hint { position: fixed; left: 0; right: 0; bottom: 12px; z-index: 3; text-align: center; font-size: 12.5px; opacity: .7; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="ray" style="left:8%;width:12vw;animation-delay:0s"></div>
+<div class="ray" style="left:30%;width:9vw;animation-delay:-3s"></div>
+<div class="ray" style="left:55%;width:13vw;animation-delay:-5s"></div>
+<div class="ray" style="left:80%;width:8vw;animation-delay:-7s"></div>
+
+<div class="weed" style="left:2%;height:120px;animation-delay:-1s"></div>
+<div class="weed" style="left:5%;height:170px;width:18px;animation-delay:-2s"></div>
+<div class="weed" style="left:12%;height:90px;animation-delay:-3s"></div>
+<div class="weed" style="left:86%;height:150px;animation-delay:-.5s"></div>
+<div class="weed" style="left:91%;height:110px;width:18px;animation-delay:-2.5s"></div>
+<div class="weed" style="left:96%;height:180px;animation-delay:-1.5s"></div>
+
+<canvas id="sea"></canvas>
+
+<div class="stage">
+  <form class="card" id="demoForm">
+    <div class="logo">🎓</div>
+    <h1>Student Management System</h1>
+    <div class="field">
+      <input type="email" id="em" placeholder=" " autocomplete="off" required>
+      <label for="em">Email address</label>
+    </div>
+    <div class="field">
+      <input type="password" id="pw" placeholder=" " autocomplete="off" required>
+      <label for="pw">Password</label>
+      <button type="button" class="eye" id="eye">SHOW</button>
+    </div>
+    <button type="submit" class="go" id="go">Sign In</button>
+    <div class="toast" id="toast"></div>
+  </form>
+</div>
+<div class="hint">Move the mouse: ripples appear and the fish swim away. Click for a big wave.</div>
+
+<script>
+(function () {
+  var cv = document.getElementById("sea"), ctx = cv.getContext("2d");
+  var W, H, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function size() { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  size(); addEventListener("resize", size);
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  var mouse = { x: -999, y: -999, on: false, lx: -999, ly: -999 };
+  var colors = ["#ffb347", "#ffd166", "#ff7f6e", "#7ee8fa", "#ff9ecd", "#b8f2a6"];
+  var fish = [], ripples = [], bubbles = [];
+
+  for (var i = 0; i < (reduce ? 14 : 34); i++) {
+    fish.push({ x: rnd(0, innerWidth), y: rnd(0, innerHeight), a: rnd(0, 6.28), base: rnd(.7, 1.4), v: 1, sz: rnd(7, 15), c: colors[i % colors.length], ph: rnd(0, 6.28), w: rnd(0, 6.28) });
+  }
+  for (var j = 0; j < 45; j++) {
+    bubbles.push({ x: rnd(0, innerWidth), y: rnd(0, innerHeight), r: rnd(2, 7), vy: rnd(.3, 1), ph: rnd(0, 6.28) });
+  }
+
+  function addRipple(x, y, delay, max) { ripples.push({ x: x, y: y, r: -delay, max: max || 110 }); if (ripples.length > 50) { ripples.shift(); } }
+
+  addEventListener("pointermove", function (e) {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true;
+    if (Math.hypot(mouse.x - mouse.lx, mouse.y - mouse.ly) > 28) {
+      if (!reduce) { addRipple(mouse.x, mouse.y, 0, 100); }
+      if (Math.random() < .5 && bubbles.length < 100) { bubbles.push({ x: mouse.x, y: mouse.y, r: rnd(2, 5), vy: rnd(.6, 1.4), ph: rnd(0, 6.28) }); }
+      mouse.lx = mouse.x; mouse.ly = mouse.y;
+    }
+  });
+  addEventListener("pointerdown", function (e) { for (var k = 0; k < 3; k++) { addRipple(e.clientX, e.clientY, k * 14, 220); } });
+  addEventListener("pointerleave", function () { mouse.on = false; });
+
+  function turn(a, target, rate) { var d = Math.atan2(Math.sin(target - a), Math.cos(target - a)); return a + d * rate; }
+
+  function drawFish(f) {
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.a);
+    if (Math.cos(f.a) < 0) { ctx.scale(1, -1); }
+    var s = f.sz, wob = Math.sin(f.ph) * s * .5;
+    ctx.fillStyle = f.c;
+    ctx.beginPath(); ctx.moveTo(-s * .7, 0); ctx.lineTo(-s * 1.7, -s * .6 + wob); ctx.lineTo(-s * 1.7, s * .6 + wob); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, s, s * .55, 0, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.28)"; ctx.beginPath(); ctx.ellipse(s * .05, s * .18, s * .7, s * .22, 0, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(s * .5, -s * .12, s * .16, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "#06222f"; ctx.beginPath(); ctx.arc(s * .55, -s * .12, s * .08, 0, 6.283); ctx.fill();
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* soft light under the cursor */
+    if (mouse.on) {
+      var g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 120);
+      g.addColorStop(0, "rgba(180,240,255,.22)"); g.addColorStop(1, "rgba(180,240,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(mouse.x - 120, mouse.y - 120, 240, 240);
+    }
+
+    /* bubbles */
+    for (var b = 0; b < bubbles.length; b++) {
+      var bu = bubbles[b];
+      bu.y -= bu.vy; bu.ph += .03; bu.x += Math.sin(bu.ph) * .4;
+      if (bu.y < -10) { if (b < 45) { bu.y = H + 10; bu.x = rnd(0, W); } else { bubbles.splice(b, 1); b--; continue; } }
+      ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(bu.x, bu.y, bu.r, 0, 6.283); ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,.5)"; ctx.beginPath(); ctx.arc(bu.x - bu.r * .35, bu.y - bu.r * .35, bu.r * .25, 0, 6.283); ctx.fill();
+    }
+
+    /* fish: wander, and swim away from the cursor */
+    for (var n = 0; n < fish.length; n++) {
+      var f = fish[n], target = f.base, d = 9999;
+      f.w += .02; f.a += Math.sin(f.w) * .02;
+      if (mouse.on) {
+        var dx = f.x - mouse.x, dy = f.y - mouse.y; d = Math.hypot(dx, dy);
+        if (d < 160) {
+          f.a = turn(f.a, Math.atan2(dy, dx), .22);
+          target = f.base + (1 - d / 160) * 5;
+        }
+      }
+      f.v += (target - f.v) * .12;
+      f.x += Math.cos(f.a) * f.v; f.y += Math.sin(f.a) * f.v;
+      f.ph += .22 + f.v * .1;
+      if (f.x > W + 40) { f.x = -40; } else if (f.x < -40) { f.x = W + 40; }
+      if (f.y > H + 40) { f.y = -40; } else if (f.y < -40) { f.y = H + 40; }
+      drawFish(f);
+    }
+
+    /* circular ripples */
+    for (var r = 0; r < ripples.length; r++) {
+      var p = ripples[r]; p.r += 1.9;
+      if (p.r > p.max) { ripples.splice(r, 1); r--; continue; }
+      if (p.r < 0) { continue; }
+      var al = 1 - p.r / p.max;
+      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255," + (al * .6).toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.stroke();
+      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(200,245,255," + (al * .35).toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * .72, 0, 6.283); ctx.stroke();
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+
+  /* demo form behavior */
+  var pw = document.getElementById("pw"), eye = document.getElementById("eye"), toast = document.getElementById("toast");
+  eye.addEventListener("click", function () { var h = pw.type === "password"; pw.type = h ? "text" : "password"; eye.textContent = h ? "HIDE" : "SHOW"; });
+  document.getElementById("demoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    toast.textContent = "Demo only. Nothing is sent from this page."; toast.classList.add("on");
+    setTimeout(function () { toast.classList.remove("on"); }, 2600);
+  });
+})();
+</script>
+</body>
+</html>

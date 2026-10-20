@@ -34,7 +34,10 @@
     {% block custom_css %}
     {% endblock custom_css %}
 
-</head>
+
+  <link rel="stylesheet" href="{% static 'custom-theme.css' %}">
+  <script src="{% static 'theme.js' %}"></script>
+  </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
@@ -52,7 +55,14 @@
 
       <ul class="navbar-nav ml-auto">
       
-      <!-- Announcements bell with unread number -->
+             <!-- Light / dark theme button -->
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="themeToggle" title="Switch theme">
+          <i class="fas fa-moon"></i>
+        </a>
+      </li>
+
+        <!-- Announcements bell with unread number -->
       <li class="nav-item">
         <a class="nav-link" href="{% url 'staff_announcements' %}" title="Announcements">
           <i class="fas fa-bell"></i>

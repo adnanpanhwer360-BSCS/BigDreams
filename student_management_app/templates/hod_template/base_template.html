@@ -1,3 +1,5 @@
+
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -34,7 +36,9 @@
     {% block custom_css %}
     {% endblock custom_css %}
 
-</head>
+  <link rel="stylesheet" href="{% static 'custom-theme.css' %}">
+  <script src="{% static 'theme.js' %}"></script>
+  </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
@@ -52,7 +56,14 @@
 
       <ul class="navbar-nav ml-auto">
       
-      <!-- Pending student leave requests -->
+            <!-- Light / dark theme button -->
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="themeToggle" title="Switch theme">
+          <i class="fas fa-moon"></i>
+        </a>
+      </li>
+      
+        <!-- Pending student leave requests -->
       <li class="nav-item">
         <a class="nav-link" href="{% url 'student_leave_view' %}" title="Student leave requests">
           <i class="fas fa-envelope-open-text"></i>

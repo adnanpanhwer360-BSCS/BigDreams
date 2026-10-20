@@ -1,0 +1,401 @@
+/* =====================================================================
+   Shared theme for HOD, Staff and Student pages.
+   Light mode: Mist Grey.   Dark mode: Night Navy (when <html data-theme="dark">).
+   To change colors later, edit only the two blocks right below.
+   ===================================================================== */
+
+:root {
+    --ct-primary: #5b6b8c;
+    --ct-primary-2: #7384a6;
+    --ct-bg: #e6e8ec;
+    --ct-card: #f3f4f6;
+    --ct-head: #e4e7ed;
+    --ct-text: #2d3340;
+    --ct-muted: #6b7384;
+    --ct-border: #d0d4dc;
+    --ct-hover: #dadde5;
+    --ct-side-1: #2b323d;
+    --ct-side-2: #1f242d;
+    --ct-shadow: 0 4px 18px rgba(40, 50, 70, 0.12);
+    --ct-glow: 0 6px 16px rgba(60, 75, 110, 0.35);
+}
+
+html[data-theme="dark"] {
+    --ct-primary: #4f7cff;
+    --ct-primary-2: #6d8cff;
+    --ct-bg: #0f1629;
+    --ct-card: #18213a;
+    --ct-head: #202b4a;
+    --ct-text: #e5e9f5;
+    --ct-muted: #9aa6c4;
+    --ct-border: #2a3556;
+    --ct-hover: #25314f;
+    --ct-side-1: #0a1020;
+    --ct-side-2: #070b16;
+    --ct-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    --ct-glow: 0 6px 16px rgba(79, 124, 255, 0.35);
+}
+
+/* ---------- Page ---------- */
+body,
+.content-wrapper {
+    background: var(--ct-bg);
+    color: var(--ct-text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.content-wrapper .content,
+.content-wrapper .content-header {
+    animation: ctFadeUp 0.45s ease both;
+}
+
+@keyframes ctFadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.content-header h1,
+.content-header h1 a,
+.content-wrapper h1,
+.content-wrapper h2,
+.content-wrapper h3,
+.content-wrapper h4,
+.content-wrapper h5 {
+    color: var(--ct-text);
+}
+
+.card-header .card-title,
+.card-primary > .card-header h3,
+.small-box h3,
+.small-box p {
+    color: inherit;
+}
+
+/* ---------- Top bar ---------- */
+.main-header {
+    background: var(--ct-card);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--ct-primary), var(--ct-primary-2)) 1;
+    box-shadow: 0 2px 14px rgba(20, 30, 60, 0.08);
+    transition: background 0.3s ease;
+}
+
+.main-header h4 {
+    color: var(--ct-text);
+    font-weight: 600;
+}
+
+.main-header .navbar-nav .nav-link {
+    color: var(--ct-muted);
+    border-radius: 10px;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.main-header .navbar-nav .nav-link:hover {
+    color: var(--ct-primary);
+    background: var(--ct-head);
+    transform: translateY(-1px);
+}
+
+/* ---------- Sidebar ---------- */
+.main-sidebar {
+    background: linear-gradient(180deg, var(--ct-side-1), var(--ct-side-2));
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link {
+    border-radius: 10px;
+    transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link:hover {
+    background: rgba(255, 255, 255, 0.09);
+    transform: translateX(4px);
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active:hover {
+    background: linear-gradient(135deg, var(--ct-primary), var(--ct-primary-2));
+    color: #fff;
+    box-shadow: var(--ct-glow);
+    transform: none;
+}
+
+/* ---------- Footer ---------- */
+.main-footer {
+    background: var(--ct-card);
+    border-top: 1px solid var(--ct-border);
+    color: var(--ct-muted);
+    transition: background 0.3s ease;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background: var(--ct-card);
+    color: var(--ct-text);
+    border: 1px solid var(--ct-border);
+    border-radius: 16px;
+    box-shadow: var(--ct-shadow);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.3s ease;
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--ct-border);
+    border-radius: 16px 16px 0 0;
+}
+
+.card-header .card-title {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* Plain cards (like "Staff Details"): colored accent bar on the heading */
+.card:not(.card-primary):not(.card-success):not(.card-danger):not(.card-warning):not(.card-info) > .card-header {
+    background: var(--ct-head);
+    border-left: 5px solid var(--ct-primary);
+}
+
+.card-primary > .card-header {
+    background: linear-gradient(135deg, var(--ct-primary), var(--ct-primary-2));
+    border-bottom: 0;
+    color: #fff;
+}
+
+.card-footer {
+    background: transparent;
+    border-top: 1px solid var(--ct-border);
+    border-radius: 0 0 16px 16px;
+}
+
+/* ---------- Small colored boxes (dashboard) ---------- */
+.small-box {
+    border-radius: 14px;
+    box-shadow: var(--ct-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+.small-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 28px rgba(20, 30, 60, 0.22);
+}
+
+/* ---------- Tables ---------- */
+.table {
+    color: var(--ct-text);
+}
+
+.table thead th {
+    background: var(--ct-head);
+    color: var(--ct-muted);
+    border-top: 0;
+    border-bottom: 2px solid var(--ct-border);
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table td,
+.table th {
+    border-color: var(--ct-border);
+    vertical-align: middle;
+}
+
+.table tbody tr:nth-of-type(even) {
+    background: var(--ct-head);
+}
+
+.table-hover tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+    background: var(--ct-hover);
+    color: var(--ct-text);
+}
+
+/* Smaller, neater Edit and Delete buttons inside tables */
+.table .btn {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(20, 30, 60, 0.2);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(135deg, var(--ct-primary), var(--ct-primary-2));
+    border-color: transparent;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    filter: brightness(0.92);
+}
+
+/* ---------- Forms ---------- */
+.form-control,
+.custom-select {
+    background: var(--ct-card);
+    color: var(--ct-text);
+    border: 1.5px solid var(--ct-border);
+    border-radius: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+
+.form-control:focus,
+.custom-select:focus {
+    background: var(--ct-card);
+    color: var(--ct-text);
+    border-color: var(--ct-primary);
+    box-shadow: 0 0 0 4px var(--ct-border);
+}
+
+.form-control::placeholder {
+    color: var(--ct-muted);
+}
+
+select.form-control option {
+    background: var(--ct-card);
+    color: var(--ct-text);
+}
+
+label {
+    color: var(--ct-text);
+}
+
+/* Search box: rounded pill that grows when you click in it */
+.card-tools .input-group {
+    transition: width 0.3s ease;
+}
+
+.card-tools .input-group:focus-within {
+    width: 240px !important;
+}
+
+.card-tools .input-group .form-control {
+    border-radius: 20px 0 0 20px;
+}
+
+.card-tools .input-group-append .btn {
+    border-radius: 0 20px 20px 0;
+}
+
+/* ---------- Dropdown menus ---------- */
+.dropdown-menu {
+    background: var(--ct-card);
+    border: 1px solid var(--ct-border);
+    border-radius: 12px;
+    box-shadow: var(--ct-shadow);
+}
+
+.dropdown-item {
+    color: var(--ct-text);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--ct-head);
+    color: var(--ct-text);
+}
+
+.dropdown-divider {
+    border-top-color: var(--ct-border);
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(120, 130, 160, 0.45); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(120, 130, 160, 0.7); }
+
+/* =====================================================================
+   Dark mode touches for pages written with fixed light colors
+   (attendance, announcements and so on)
+   ===================================================================== */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-light,
+html[data-theme="dark"] .student-card,
+html[data-theme="dark"] .ann-item,
+html[data-theme="dark"] .selection-box,
+html[data-theme="dark"] .date-box {
+    background: var(--ct-card) !important;
+    border-color: var(--ct-border) !important;
+    color: var(--ct-text);
+}
+
+html[data-theme="dark"] .ann-item.is-new {
+    background: var(--ct-head) !important;
+}
+
+html[data-theme="dark"] .student-name,
+html[data-theme="dark"] .student-section-title h4,
+html[data-theme="dark"] .ann-title,
+html[data-theme="dark"] .selection-box label {
+    color: var(--ct-text) !important;
+}
+
+html[data-theme="dark"] .ann-message {
+    color: var(--ct-muted) !important;
+}
+
+html[data-theme="dark"] .attendance-btn {
+    background: var(--ct-card);
+    color: var(--ct-text);
+    border-color: var(--ct-border);
+}
+
+html[data-theme="dark"] .border {
+    border-color: var(--ct-border) !important;
+}
+
+html[data-theme="dark"] .thead-light th {
+    background: var(--ct-head);
+    color: var(--ct-muted);
+    border-color: var(--ct-border);
+}
+
+html[data-theme="dark"] .text-muted {
+    color: var(--ct-muted) !important;
+}
+
+html[data-theme="dark"] .input-group-text,
+html[data-theme="dark"] .btn-default {
+    background: var(--ct-card);
+    color: var(--ct-text);
+    border-color: var(--ct-border);
+}
+
+html[data-theme="dark"] .close {
+    color: var(--ct-text);
+    text-shadow: none;
+}
+
+/* People who prefer less motion get no animation */
+@media (prefers-reduced-motion: reduce) {
+    .content-wrapper .content,
+    .content-wrapper .content-header {
+        animation: none;
+    }
+    .small-box:hover,
+    .btn:hover:not(:disabled) {
+        transform: none;
+    }
+}
