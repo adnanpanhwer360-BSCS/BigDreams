@@ -45,7 +45,14 @@
                         <div class="card-header">
                             <h3 class="card-title">Student Details</h3>
 
-                            <div class="card-tools">
+                            <div class="card-tools d-flex">
+                            <select id="courseFilter" class="form-control form-control-sm mr-2" style="width: 180px;">
+                                <option value="">All Courses</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.course_name }}">{{ course.course_name }}</option>
+                                {% endfor %}
+                            </select>
+
                             <div class="input-group input-group-sm" style="width: 150px;">
                                 <input type="text" id="studentSearch" class="form-control float-right" placeholder="Search Student...">
 
@@ -78,7 +85,7 @@
                             </thead>
                             <tbody>
                                 {% for student in students %}
-                                <tr>
+                                <tr data-course="{{ student.course_id.course_name }}">
                                 <td>{{ student.admin.id }}</td>
                                 <td>{{ student.admin.first_name }}</td>
                                 <td>{{ student.admin.last_name }}</td>
@@ -112,20 +119,26 @@
         </div><!-- /.container-fluid -->
       </section>
   
-      <script>
-    document.getElementById("studentSearch").addEventListener("keyup", function () {
-        var searchValue = this.value.toLowerCase();
+<script>
+    // Shows only the rows that match BOTH the search text and the selected course
+    function filterStudents() {
+        var searchValue = document.getElementById("studentSearch").value.toLowerCase();
+        var selectedCourse = document.getElementById("courseFilter").value;
         var rows = document.querySelectorAll("table tbody tr");
 
         rows.forEach(function (row) {
-            var rowText = row.textContent.toLowerCase();
+            var matchesSearch = row.textContent.toLowerCase().includes(searchValue);
+            var matchesCourse = selectedCourse === "" || row.getAttribute("data-course") === selectedCourse;
 
-            if (rowText.includes(searchValue)) {
+            if (matchesSearch && matchesCourse) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";
             }
         });
-    });
+    }
+
+    document.getElementById("studentSearch").addEventListener("keyup", filterStudents);
+    document.getElementById("courseFilter").addEventListener("change", filterStudents);
 </script>
   {% endblock main_content %}

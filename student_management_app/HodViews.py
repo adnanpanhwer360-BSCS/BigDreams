@@ -396,11 +396,15 @@ def add_student_save(request):
         return redirect('add_student')
 def manage_student(request):
     students = Students.objects.all()
+
+    # All courses, for the course filter dropdown
+    courses = Courses.objects.all()
+
     context = {
-        "students": students
+        "students": students,
+        "courses": courses
     }
     return render(request, 'hod_template/manage_student_template.html', context)
-
 def manage_fee(request):
 
     students = Students.objects.select_related(
